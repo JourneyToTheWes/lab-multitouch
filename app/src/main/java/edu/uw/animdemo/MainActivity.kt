@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.view.MotionEventCompat
+import android.support.v4.view.MotionEventCompat.getX
+import android.support.v4.view.MotionEventCompat.getY
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.GestureDetector
@@ -47,7 +49,12 @@ class MainActivity : AppCompatActivity() {
         when (action) {
             MotionEvent.ACTION_DOWN //put finger down
             -> {
-                //Log.v(TAG, "finger down");
+                Log.v(TAG, "finger down");
+
+                val pointerIndex: Int = MotionEventCompat.getActionIndex(event)
+                Log.v(TAG, "Pointer Index: $pointerIndex")
+                val pointerId: Int = MotionEventCompat.getPointerId(event, pointerIndex)
+                Log.v(TAG, "Pointer Id: $pointerId")
 
                 val xAnim = ObjectAnimator.ofFloat(view!!.ball, "x", x)
                 xAnim.duration = 1000
@@ -62,16 +69,31 @@ class MainActivity : AppCompatActivity() {
                 //                view.ball.cy = y;
                 //                view.ball.dx = (x - view.ball.cx)/Math.abs(x - view.ball.cx)*30;
                 //                view.ball.dy = (y - view.ball.cy)/Math.abs(y - view.ball.cy)*30;
+
+                view!!.addTouch(pointerId, getX(event, pointerIndex), getY(event, pointerIndex))
+
                 return true
             }
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                Log.v(TAG, "Subsequent finger down")
+            }
             MotionEvent.ACTION_MOVE //move finger
-            ->
-                //Log.v(TAG, "finger move");
+            -> {
+                Log.v(TAG, "finger move")
                 //                view.ball.cx = x;
                 //                view.ball.cy = y;
                 return true
-            MotionEvent.ACTION_UP //lift finger up
-                , MotionEvent.ACTION_CANCEL //aborted gesture
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+                Log.v(TAG, "Subsequent finger up")
+            }
+            MotionEvent.ACTION_UP -> { //lift finger up
+                val pointerIndex: Int = MotionEventCompat.getActionIndex(event)
+                Log.v(TAG, "Pointer Index: $pointerIndex")
+                val pointerId: Int = MotionEventCompat.getPointerId(event, pointerIndex)
+                Log.v(TAG, "Pointer Id: $pointerId")
+            }
+            MotionEvent.ACTION_CANCEL //aborted gesture
                 , MotionEvent.ACTION_OUTSIDE //outside bounds
             -> return super.onTouchEvent(event)
             else -> return super.onTouchEvent(event)
