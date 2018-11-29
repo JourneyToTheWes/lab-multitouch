@@ -34,7 +34,7 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public Ball ball; //public for easy access
 
-    private HashMap<Integer, Ball> touches;
+    private HashMap<Integer, Ball> touches = new HashMap<Integer, Ball>();
 
     /**
      * We need to override all the constructors, since we don't know which will be called
@@ -122,6 +122,11 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         canvas.drawColor(Color.rgb(51,10,111)); //purple out the background
 
         canvas.drawCircle(ball.cx, ball.cy, ball.radius, whitePaint); //we can draw directly onto the canvas
+
+        for (int pointerIndex : touches.keySet()) {
+            Ball ball = touches.get(pointerIndex);
+            canvas.drawCircle(ball.cx, ball.cy, ball.radius, goldPaint);
+        }
     }
 
 
@@ -164,7 +169,15 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     public synchronized void addTouch(int pointerId, float x, float y) {
-        touches.put(pointerId, new Ball(x, y, 10));
+        touches.put(pointerId, new Ball(x, y, 100));
+    }
+
+    public synchronized void removeTouch(int pointerId) {
+        touches.remove(pointerId);
+    }
+
+    public synchronized void moveTouch(int ballId, float x, float y) {
+        touches.put(ballId, new Ball(x, y, 100));
     }
 
     /**
